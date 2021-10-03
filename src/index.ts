@@ -3,10 +3,7 @@ import {
   Request, 
   ResponseToolkit 
 } from "@hapi/hapi";
-
-import { 
-  nate 
-} from '@nate/instrumentation'
+import { putWalletsAccountsHandler, putWalletsAccountsHandlerOptions } from "./get-name.controller";
 
 const init = async () => {
 
@@ -15,25 +12,10 @@ const init = async () => {
         host: '0.0.0.0'
     });
 
-    nate.instrumentation.installMetrics({
-      service: 'tssampleapp',
-      version: '1.0.0'
-    }, server);
-
     server.route({
       method: 'GET',
-      path: '/',
-      handler: (request: Request, h: ResponseToolkit) => {
-          return 'Hello World!';
-      }
-    });
-
-    server.route({
-        method: 'GET',
-        path: '/test',
-        handler: (request: Request, h: ResponseToolkit) => {
-            return 'I am alive 🐔 ...';
-        }
+      path: '/stripe',
+      handler: putWalletsAccountsHandler
     });
 
   await server.start();
