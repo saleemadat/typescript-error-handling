@@ -1,10 +1,9 @@
 {
-  "name": "nate.template.microservice",
+  "name": "typescript-test",
   "version": "1.0.0",
   "description": "TODO",
   "main": "index.js",
-  "repository": "git@github.com:NateAI/nate.template.microservice.ts.git",
-  "author": "Nate Tech",
+  "author": "saleem",
   "license": "MIT",
   "scripts": {
     "start": "./node_modules/nodemon/bin/nodemon.js -e ts  --exec \"yarn run compile\"",
@@ -22,5 +21,13 @@
     "@types/node": "^15.12.2",
     "nodemon": "^2.0.7",
     "typescript": "^4.3.2"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/saleemadat/typescript-error-handling.git"
+  },
+  "bugs": {
+    "url": "https://github.com/saleemadat/typescript-error-handling/issues"
+  },
+  "homepage": "https://github.com/saleemadat/typescript-error-handling#readme"
 }
