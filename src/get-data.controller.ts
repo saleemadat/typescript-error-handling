@@ -1,5 +1,5 @@
 import { Request, ResponseObject, ResponseToolkit, RouteOptions } from '@hapi/hapi';
-import { getRequest } from './github';
+import { getRequest } from './api';
 
 const log = console.log
 

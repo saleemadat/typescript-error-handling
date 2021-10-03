@@ -3,7 +3,7 @@ import {
   Request, 
   ResponseToolkit 
 } from "@hapi/hapi";
-import { putWalletsAccountsHandler, putWalletsAccountsHandlerOptions } from "./get-name.controller";
+import { putWalletsAccountsHandler} from "./get-data.controller";
 
 const init = async () => {
 
