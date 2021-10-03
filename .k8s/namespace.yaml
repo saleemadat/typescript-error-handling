@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    deployment: terraform
+    dominion: {{DOMINION}}
+    environment: {{ENVIRONMENT}}
+    owner: {{OWNER}}
+    prefix: ""
+    subdominion: {{SUBDOMINION}}
+    version_name: {{VERSION_NAME}}
+  name: {{ENVIRONMENT}}-{{DOMINION}}-{{SUBDOMINION}}-{{VERSION_NAME}}-namespace

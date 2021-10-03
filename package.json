@@ -1,0 +1,26 @@
+{
+  "name": "nate.template.microservice",
+  "version": "1.0.0",
+  "description": "TODO",
+  "main": "index.js",
+  "repository": "git@github.com:NateAI/nate.template.microservice.ts.git",
+  "author": "Nate Tech",
+  "license": "MIT",
+  "scripts": {
+    "start": "./node_modules/nodemon/bin/nodemon.js -e ts  --exec \"yarn run compile\"",
+    "compile": "tsc && node ./dist/index.js",
+    "lint": "echo Not Implemented",
+    "test": "echo Not Implemented"
+  },
+  "dependencies": {
+    "@hapi/hapi": "^20.1.3",
+    "@nate/instrumentation": "^0.0.4",
+    "prom-client": "^13.1.0"
+  },
+  "devDependencies": {
+    "@types/hapi__hapi": "^20.0.8",
+    "@types/node": "^15.12.2",
+    "nodemon": "^2.0.7",
+    "typescript": "^4.3.2"
+  }
+}

@@ -1,0 +1,92 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    deployment: terraform
+    dominion: {{DOMINION}}
+    environment: {{ENVIRONMENT}}
+    owner: {{OWNER}}
+    subdominion: {{SUBDOMINION}}
+    version_name: {{VERSION_NAME}}
+  name: {{ENVIRONMENT}}-{{DOMINION}}-{{SUBDOMINION}}-{{VERSION_NAME}}-deployment
+  namespace: {{ENVIRONMENT}}-{{DOMINION}}-{{SUBDOMINION}}-{{VERSION_NAME}}-namespace
+spec:
+  minReadySeconds: 5
+  progressDeadlineSeconds: 300
+  replicas: {{REPLICAS}}
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      deployment: terraform
+      dominion: {{DOMINION}}
+      environment: {{ENVIRONMENT}}
+      owner: {{OWNER}}
+      prefix: ""
+      subdominion: {{SUBDOMINION}}
+      version_name: {{VERSION_NAME}}
+  strategy:
+    rollingUpdate:
+      maxSurge: 5
+      maxUnavailable: 50%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        deployment: terraform
+        dominion: {{DOMINION}}
+        environment: {{ENVIRONMENT}}
+        owner: {{OWNER}}
+        prefix: ""
+        subdominion: {{SUBDOMINION}}
+        version_name: {{VERSION_NAME}}
+    spec:
+      automountServiceAccountToken: true
+      containers:
+      - env:
+        - name: APP_ENV
+          value: "{{APP_ENV}}"
+        - name: OTEL_ENABLED
+          value: "{{OTEL_ENABLED}}"
+        - name: OTEL_COLLECTOR_URL
+          value: "{{OTEL_COLLECTOR_URL}}"
+        image: 847574585735.dkr.ecr.eu-west-1.amazonaws.com/nate-eu-west-1-{{DOMINION}}-{{SUBDOMINION}}-{{VERSION_NAME}}-ecr:{{APP_ENV}}
+        imagePullPolicy: Always
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: {{LIVE_PROBE_PATH}}
+            port: {{CONTAINER_PORT}}
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          successThreshold: 1
+          timeoutSeconds: 30
+        name: default
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: {{READY_PROBE_PATH}}
+            port: {{CONTAINER_PORT}}
+            scheme: HTTP
+          initialDelaySeconds: 30
+          periodSeconds: 5
+          successThreshold: 5
+          timeoutSeconds: 10
+        resources:
+          limits:
+            cpu: "1"
+            memory: 1000Mi
+          requests:
+            cpu: 200m
+            memory: 500Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      enableServiceLinks: true
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: {{ENVIRONMENT}}-{{DOMINION}}-{{SUBDOMINION}}-{{VERSION_NAME}}-service-account
+      serviceAccountName: {{ENVIRONMENT}}-{{DOMINION}}-{{SUBDOMINION}}-{{VERSION_NAME}}-service-account
+      shareProcessNamespace: false
+      terminationGracePeriodSeconds: 30

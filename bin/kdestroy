@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+
+set -eu
+
+if [ $# -eq 0 ]; then
+    echo "Usage: "
+    echo "  $(basename $0) <environment(dev|staging|prod)>"
+    echo "Example: "
+    echo "  $(basename $0) dev"
+    echo "  $(basename $0) staging"
+    echo "  $(basename $0) prod"
+    exit 1
+fi
+
+# Vars
+
+export APP_ENV=$1
+. $PWD/.env
+. $PWD/.k8s/vars/$APP_ENV.env
+
+# Cluster Login
+aws eks --region $AWS_REGION update-kubeconfig --name $ENVIRONMENT-eks-cluster
+
+while true; do
+    read -p "WARNING, you are about to destroy $ENVIRONMENT-$DOMINION-$SUBDOMINION-$VERSION_NAME-namespace and everything under it, Do you wish to proceed[y/n]?" yn
+    case $yn in
+        [Yy]* ) break;;
+        [Nn]* ) exit 1;;
+        * ) echo "Please answer 'Y' or 'N'";;
+    esac
+done
+
+# Deleting namespace
+$PWD/bin/template \
+  $PWD/.k8s/namespace.yaml \
+  -f $PWD/.k8s/vars/$APP_ENV.env | kubectl delete -f -

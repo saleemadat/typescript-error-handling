@@ -1,0 +1,21 @@
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  labels:
+    deployment: terraform
+    dominion: {{DOMINION}}
+    environment: {{ENVIRONMENT}}
+    owner: {{OWNER}}
+    prefix: ""
+    subdominion: {{SUBDOMINION}}
+    version_name: {{VERSION_NAME}}
+  name: {{ENVIRONMENT}}-{{DOMINION}}-{{SUBDOMINION}}-{{VERSION_NAME}}-hpa
+  namespace: {{ENVIRONMENT}}-{{DOMINION}}-{{SUBDOMINION}}-{{VERSION_NAME}}-namespace
+spec:
+  maxReplicas: 5
+  minReplicas: 2
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ENVIRONMENT}}-{{DOMINION}}-{{SUBDOMINION}}-{{VERSION_NAME}}-deployment
+  targetCPUUtilizationPercentage: 75

@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+
+set -eu
+
+# Help 
+
+if [ $# -eq 0 ]; then
+    echo "Usage: "
+    echo "  $(basename $0) <environment(dev|staging|prod)>"
+    echo "Example: "
+    echo "  $(basename $0) dev"
+    echo "  $(basename $0) staging"
+    echo "  $(basename $0) prod"
+    exit 1
+fi
+
+# Vars
+
+APP_ENV=$1
+. $PWD/.env
+. $PWD/.k8s/vars/$APP_ENV.env
+
+
+# Destroy All
+
+pushd infrastructure
+
+  terraform init -backend-config=$PWD/backend.hcl 
+  terraform workspace select $ENVIRONMENT
+  terraform destroy \
+    -var "aws_region=$AWS_REGION" \
+    -var "environment=$ENVIRONMENT" \
+    -var "dominion=$DOMINION" \
+    -var "subdominion=$SUBDOMINION" \
+    -var "owner=$OWNER" \
+    -var "version_name=$VERSION_NAME"
+popd
+
+echo "#!/bin/bash" > .env

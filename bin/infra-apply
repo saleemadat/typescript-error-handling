@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+
+set -eu
+
+# Help
+
+if [ $# -eq 0 ]; then
+    echo "Usage: "
+    echo "  $(basename $0) <environment(dev|staging|prod)> <build_number>"
+    echo "Example: "
+    echo "  $(basename $0) dev"
+    echo "  $(basename $0) staging"
+    echo "  $(basename $0) prod"
+    exit 1
+fi
+
+# Vars 
+
+APP_ENV=$1
+. $PWD/.k8s/vars/$APP_ENV.env
+
+# Deploy Infra
+
+pushd infrastructure 
+
+  terraform init -backend-config=$PWD/backend.hcl 
+  terraform workspace new $APP_ENV || true
+  terraform workspace select $APP_ENV
+  terraform refresh \
+    -var "aws_region=$AWS_REGION" \
+    -var "environment=$ENVIRONMENT" \
+    -var "dominion=$DOMINION" \
+    -var "subdominion=$SUBDOMINION" \
+    -var "owner=$OWNER" \
+    -var "version_name=$VERSION_NAME"
+
+  if [ -f $PWD/terraform-plan.out ]; then 
+    echo "*** !!! Executing terraform apply with a plan !!! ***"
+    terraform apply -auto-approve $PWD/terraform-plan.out
+  else 
+    echo "*** !!! Executing terraform apply without a plan !!! ***"
+    terraform apply -auto-approve \
+      -var "aws_region=$AWS_REGION" \
+      -var "environment=$ENVIRONMENT" \
+      -var "dominion=$DOMINION" \
+      -var "subdominion=$SUBDOMINION" \
+      -var "owner=$OWNER" \
+      -var "version_name=$VERSION_NAME"
+  fi
+
+  DB_CONNECTION=$(terraform output db_connection | sed 's/"//g')
+  DB_REPL_SRC_CONN=$(terraform output db_repl_src_connection | sed 's/"//g')
+
+popd
+
+echo "export ECR_URL='$ECR_URL'" > .env
+echo "export DB_CONNECTION='$DB_CONNECTION'" >> .env
+echo "export DB_REPL_SRC_CONN='$DB_REPL_SRC_CONN'" >> .env
+
+direnv allow && source $PWD/.env
