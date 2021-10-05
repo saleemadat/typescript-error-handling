@@ -54,6 +54,7 @@ async function makeAxiosRequest(bool: Boolean = true): Promise<Result<number, Er
 
 export async function getRequest(){
   const request = await makeAxiosRequest(false)
+  
   if(request.isErr()){
     throw request.error;
   }
